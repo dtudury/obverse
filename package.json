@@ -1,0 +1,26 @@
+{
+  "name": "obverse",
+  "version": "0.0.2",
+  "description": "observable object versioning universe",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dtudury/obverse.git"
+  },
+  "keywords": [
+    "object",
+    "hash",
+    "object",
+    "version",
+    "observe"
+  ],
+  "author": "",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/dtudury/obverse/issues"
+  },
+  "homepage": "https://github.com/dtudury/obverse#readme"
+}
