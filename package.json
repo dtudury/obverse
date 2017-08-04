@@ -2,8 +2,10 @@
   "name": "obverse",
   "version": "0.0.2",
   "description": "observable object versioning universe",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
+    "build": "babel src -d lib",
+    "prepublish": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,5 +24,10 @@
   "bugs": {
     "url": "https://github.com/dtudury/obverse/issues"
   },
-  "homepage": "https://github.com/dtudury/obverse#readme"
+  "homepage": "https://github.com/dtudury/obverse#readme",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1"
+  }
 }
