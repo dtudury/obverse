@@ -1,16 +1,16 @@
-const {
+import {
     toType,
     store,
     referencers,
-    reference,
-    dereference,
+    v_to_i,
+    i_to_v,
     BOOLEAN,
     NULL,
     UNDEFINED,
     NUMBER,
     STRING,
     SYMBOL
-} = require("./primitiveStore");
+} from "./primitiveStore";
 
 const CHECKOUT = Symbol("create a managed instance of the data");
 const PUSH = Symbol("send changes upstream");
@@ -48,7 +48,7 @@ function checkout(p) {
     return p[CHECKOUT];
 }
 
-module.exports = {
+export {
     CHECKOUT,
     PUSH,
     PULL,

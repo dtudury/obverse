@@ -1,6 +1,6 @@
 let toType = v => Object.prototype.toString.call(v);
-let dereference = i => _a[i];
-let reference = (v, _) => (referencers[_ = toType(v)] || default_referencer)(v, _);
+let i_to_v = i => _a[i];
+let v_to_i = (v, _) => (referencers[_ = toType(v)] || default_referencer)(v, _);
 let store = v => _a.push(v) - 1;
 let basic_referencer = (v, type) => _o[type][v] || (_o[type][v] = store(v));
 let default_referencer = (v, type) => {
@@ -34,12 +34,12 @@ let referencers = {
     [SYMBOL]:       basic_referencer
 }
 
-module.exports = {
+export {
     toType,
     store,
     referencers,
-    reference,
-    dereference,
+    v_to_i,
+    i_to_v,
     BOOLEAN,
     NULL,
     UNDEFINED,
