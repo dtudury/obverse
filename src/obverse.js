@@ -4,12 +4,6 @@ import {
     v_to_i_for_t,
     v_to_i,
     i_to_v,
-    BOOLEAN,
-    NULL,
-    UNDEFINED,
-    NUMBER,
-    STRING,
-    SYMBOL,
     OBJECT,
     ARRAY
 } from "./primitiveStore";
@@ -32,7 +26,7 @@ const v_to_i_for_obj = v => {
 v_to_i_for_t[OBJECT] = v_to_i_for_obj;
 v_to_i_for_t[ARRAY] = v_to_i_for_obj;
 
-function hash(o) {
+const o_to_m = o => {
     Object.keys(o).forEach(n => {
         const v = o[n];
         const t = v_to_t(v);
@@ -44,7 +38,11 @@ function hash(o) {
             o[n] = v_to_i(v, t);
         }
     });
-    return v_to_i(o);
+    return o;
+}
+function hash(o) {
+    const m = o_to_m(o);
+    return v_to_i(m);
 }
 
 function clone(o) {
