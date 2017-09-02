@@ -5,6 +5,6 @@ export default {
     plugins: [buble()],
     output: {
         file: "dist/obverse.js",
-        format: "es"
+        format: "cjs"
     }
 }
