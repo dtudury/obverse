@@ -1,25 +1,20 @@
-const 
-    v_to_t = v => Object.prototype.toString.call(v),
+const v_to_t = v => Object.prototype.toString.call(v),
     i_to_v = i => _a[i],
     new_v_to_i = v => _a.push(v) - 1,
-    v_to_i = (v, t = v_to_t(v)) => (
-        v_to_i_for_t[t] || (() => {
-            throw new Error( `type ${t} not in v_to_i_for_t`);
-        })
-    )(v);
+    v_to_i = (v, t = v_to_t(v)) => (v_to_i_for_t[t] || (() => {
+        throw new Error(`type ${t} not in v_to_i_for_t`);
+    }))(v);
 
-const
-    BOOLEAN =     v_to_t(false),
-    NULL =        v_to_t(null),
-    UNDEFINED =   v_to_t(),
-    NUMBER =      v_to_t(0),
-    STRING =      v_to_t(""),
-    SYMBOL =      v_to_t(Symbol.iterator),
-    OBJECT =      v_to_t({}),
-    ARRAY =       v_to_t([]);
+const BOOLEAN = v_to_t(false),
+    NULL = v_to_t(null),
+    UNDEFINED = v_to_t(),
+    NUMBER = v_to_t(0),
+    STRING = v_to_t(""),
+    SYMBOL = v_to_t(Symbol.iterator),
+    OBJECT = v_to_t({}),
+    ARRAY = v_to_t([]);
 
-const
-    nums = {},
+const nums = {},
     strs = {},
     syms = {},
     _o = {
@@ -27,15 +22,16 @@ const
         [STRING]: strs,
         [SYMBOL]: syms
     },
-    _a = [ , null, true, false],    //0: undefined, 1: null, 2: true, 3: false
-
+    _a = [
+        , null, true, false
+    ], //0: undefined, 1: null, 2: true, 3: false
     v_to_i_for_t = {
-        [BOOLEAN]:      v => v ? 2 : 3, //hard-coded (it's okay, I'm a professional)
-        [NULL]:         () => 1,        //hard-coded
-        [UNDEFINED]:    () => 0,        //hard-coded
-        [NUMBER]:       v => nums[v] || (nums[v] = new_v_to_i(v)),
-        [STRING]:       v => strs[v] || (strs[v] = new_v_to_i(v)),
-        [SYMBOL]:       v => syms[v] || (syms[v] = new_v_to_i(v))
+        [BOOLEAN]: v => v ? 2 : 3, //hard-coded (it's okay, I'm a professional)
+        [NULL]: () => 1, //hard-coded
+        [UNDEFINED]: () => 0, //hard-coded
+        [NUMBER]: v => nums[v] || (nums[v] = new_v_to_i(v)),
+        [STRING]: v => strs[v] || (strs[v] = new_v_to_i(v)),
+        [SYMBOL]: v => syms[v] || (syms[v] = new_v_to_i(v))
     };
 
 export {
