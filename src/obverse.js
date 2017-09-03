@@ -28,7 +28,11 @@ Object.assign(v_to_i_for_t, {
     [ARRAY]: v_to_i_for_obj
 });
 
-const o_to_m = o => {
+const obvize = o => {
+    const t = v_to_t(o);
+    if (t !== ARRAY && t !== OBJECT) {
+        return v_to_i(o, t);
+    }
     const m = new o.constructor();
     Object.keys(o).forEach(n => {
         const v = o[n];
@@ -41,26 +45,29 @@ const o_to_m = o => {
             m[n] = v_to_i(v, t);
         }
     });
-    return m;
-};
-
-const obvize = o => {
-    const m = o_to_m(o);
     const d = new o.constructor(); //differences
     const p = new Proxy(m, {
         get: (target, property, receiver) => {
-            console.log(`get ${property.toString()}`);
+            //console.log(`get ${property.toString()}`);
             return {
                 [HASH]: i
             }[property] || i_to_v(d[property] || m[property]);
         },
         set: (target, property, value, receiver) => {
-            console.log(`set ${property} to ${value}`);
+            //console.log(`set ${property} to ${value}`);
             const h = hash(value);
             if (m[property] === h) {
-                delete d[property];
+                if (d[property]) {
+                    console.log("existing change?");
+                    delete d[property];
+                    //update_dependents();
+                }
             } else {
-                d[property] = h;
+                if (d[property] !== h) {
+                    console.log("setting", m[property], "to", h);
+                    d[property] = h;
+                    //update_dependents();
+                }
             }
             return h;
         }
