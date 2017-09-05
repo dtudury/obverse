@@ -17,6 +17,7 @@ const BRANCH = Symbol("create separate data copy");
 const MERGE = Symbol("merge current copy's changes to another copy");
 
 const HASH = Symbol("hash as index of value in storage array");
+const PARENTS = Symbol("obvs with hashes dependent on current obv");
 
 const objs = {};
 const v_to_i_for_obj = v => {
@@ -28,43 +29,38 @@ Object.assign(v_to_i_for_t, {
     [ARRAY]: v_to_i_for_obj
 });
 
-const obvize = o => {
+const obvize = (o, parent) => {
     const t = v_to_t(o);
     if (t !== ARRAY && t !== OBJECT) {
         return v_to_i(o, t);
     }
-    const m = new o.constructor();
-    Object.keys(o).forEach(n => {
-        const v = o[n];
-        const t = v_to_t(v);
-        if (t === ARRAY) {
-            m[n] = obvize(v);
-        } else if (t === OBJECT) {
-            m[n] = obvize(v);
-        } else {
-            m[n] = v_to_i(v, t);
-        }
-    });
+    const m = new o.constructor(); //original map
+    const c = new o.constructor(); //current map
     const d = new o.constructor(); //differences
+    const parents = new Set(parent ? [parent] : [])
     const p = new Proxy(m, {
         get: (target, property, receiver) => {
             //console.log(`get ${property.toString()}`);
             return {
-                [HASH]: i
+                [HASH]: i,
+                [PARENTS]: parents
             }[property] || i_to_v(d[property] || m[property]);
         },
         set: (target, property, value, receiver) => {
             //console.log(`set ${property} to ${value}`);
             const h = hash(value);
+            const change = d[property];
             if (m[property] === h) {
-                if (d[property]) {
+                if (change) {
                     console.log("existing change?");
+                    change[PARENTS].delete(p);
                     delete d[property];
                     //update_dependents();
                 }
             } else {
-                if (d[property] !== h) {
+                if (change !== h) {
                     console.log("setting", m[property], "to", h);
+                    change[PARENTS].add(p);
                     d[property] = h;
                     //update_dependents();
                 }
@@ -72,6 +68,17 @@ const obvize = o => {
             return h;
         }
     })
+    Object.keys(o).forEach(n => {
+        const v = o[n];
+        const t = v_to_t(v);
+        if (t === ARRAY) {
+            m[n] = obvize(v, p);
+        } else if (t === OBJECT) {
+            m[n] = obvize(v, p);
+        } else {
+            m[n] = v_to_i(v, t);
+        }
+    });
     const i = v_to_i(p);
     return i;
 };
