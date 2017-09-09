@@ -1,5 +1,9 @@
 "use strict";
 
+require("source-map-support").install({
+    environment: "node"
+});
+
 const {obvize, i_to_v, hash} = require("./dist/obverse");
 
 let i = obvize({

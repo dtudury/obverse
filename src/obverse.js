@@ -35,7 +35,6 @@ const obvize = (o, parent) => {
         return v_to_i(o, t);
     }
     const m = new o.constructor(); //original map
-    const c = new o.constructor(); //current map
     const d = new o.constructor(); //differences
     const parents = new Set(parent ? [parent] : [])
     const p = new Proxy(m, {
@@ -53,15 +52,15 @@ const obvize = (o, parent) => {
             if (m[property] === h) {
                 if (change) {
                     console.log("existing change?");
-                    change[PARENTS].delete(p);
                     delete d[property];
+                    if (change[PARENTS]) change[PARENTS].delete(p);
                     //update_dependents();
                 }
             } else {
                 if (change !== h) {
                     console.log("setting", m[property], "to", h);
-                    change[PARENTS].add(p);
                     d[property] = h;
+                    if (change && change[PARENTS]) change[PARENTS].add(p);
                     //update_dependents();
                 }
             }
