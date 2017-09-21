@@ -30,15 +30,18 @@ let v = obvize({
 
 console.log("v", v);
 console.log("hash(v)", hash(v));
-console.log("v.e", v.e);
-console.log("hash(v.e)", hash(v.e));
+console.log("v.e.g", v.e.g);
+console.log("hash(v.e.g)", hash(v.e.g));
+
+
+delete v.e.g;
+console.log("v", v);
+console.log("hash(v)", hash(v));
 console.log("v.e.g", v.e.g);
 console.log("hash(v.e.g)", hash(v.e.g));
 
 v.e.g = 5;
 console.log("v", v);
 console.log("hash(v)", hash(v));
-console.log("v.e", v.e);
-console.log("hash(v.e)", hash(v.e));
 console.log("v.e.g", v.e.g);
 console.log("hash(v.e.g)", hash(v.e.g));

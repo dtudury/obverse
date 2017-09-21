@@ -18,9 +18,21 @@ const MERGE = Symbol("merge current copy's changes to another copy");
 */
 
 const HASH = Symbol("hash as index of value in storage array");
+const STRING = Symbol("json object with indexes instead of values");
 const PARENTS = Symbol("obvs with hashes dependent on current obv");
 
 const objs = {};
+
+function hash(value) {
+    const type = v_to_t(value);
+    if (type !== ARRAY && type !== OBJECT) {
+        return v_to_i(value, type);
+    } else {
+        return value[HASH] || obvize(value)[HASH];
+    }
+}
+
+const indexify = proxy => objs[proxy[STRING]] || (objs[proxy[STRING]] = new_v_to_i(proxy));
 
 const obvize = (object, parent) => {
     const type = v_to_t(object);
@@ -31,44 +43,46 @@ const obvize = (object, parent) => {
     const deltas = new object.constructor(); //differences
     const values = new object.constructor(); //virtual object
     const parents = new Set(parent ? [parent] : [])
-    const proxy = new Proxy(values, {
-        get: (target, property, receiver) => {
-            switch (property) {
-                case HASH:
-                    return hash_index;
-                case PARENTS:
-                    return parents;
-                default:
-                    //console.log(`get ${property.toString()}`, values[property]);
-                    return values[property]
+    const getter = property => {
+        switch (property) {
+            case HASH:
+                return hash_index;
+            case STRING:
+                return JSON.stringify(hashes);
+            case PARENTS:
+                return parents;
+            default:
+                //console.log(`get ${property.toString()}`, values[property]);
+                return values[property]
+        }
+    };
+    const setter = (property, value) => {
+        console.log(`set ${property} to ${value}`);
+        if (value !== values[property]) {
+            if (values[property] && values[property][PARENTS]) {
+                values[property][PARENTS].delete(proxy);
             }
-        },
-
-        set: (target, property, value, receiver) => {
-            //console.log(`set ${property} to ${value}`);
+            values[property] = value;
+            if (values[property] && values[property][PARENTS]) {
+                values[property][PARENTS].add(proxy);
+            }
             const hash_value = hash(value);
-            const delta = deltas[property];
             if (hashes[property] === hash_value) {
-                if (delta) {
-                    //console.log("existing delta?");
-                    delete deltas[property];
-                    values[propety] = value;
-                    if (delta[PARENTS])
-                        delta[PARENTS].delete(proxy);
-                        //update_dependents();
-                    }
-                } else {
-                if (delta !== hash_value) {
-                    //console.log("setting", hashes[property], "to", hash_value);
-                    deltas[property] = hash_value;
-                    values[property] = value;
-                    if (delta && delta[PARENTS]) {
-                        delta[PARENTS].add(proxy);
-                        //update_dependents();
-                    }
-                }
+                delete deltas[property];
+            } else {
+                deltas[property] = hash_value;
             }
-            return hash_value;
+            let new_hash = indexify(proxy);
+            console.log(new_hash)
+        }
+        return value;
+    };
+    const proxy = new Proxy(values, {
+        get: (target, property, receiver) => getter(property),
+        set: (target, property, value, receiver) => setter(property, value),
+        deleteProperty: (target, property) => {
+            setter(property);
+            return true;
         }
     })
     Object.keys(object).forEach(name => {
@@ -83,25 +97,15 @@ const obvize = (object, parent) => {
             hashes[name] = v_to_i(value, type);
         }
     });
-    const stringified = JSON.stringify(hashes);
-    const hash_index = objs[stringified] || (objs[stringified] = new_v_to_i(proxy));
+    let hash_index = indexify(proxy);
     return proxy;
 };
 
 /*
-function checkout(v) {
-    return v[CHECKOUT];
+function checkout(value) {
+    return value[CHECKOUT];
 }
 */
-
-function hash(v) {
-    const type = v_to_t(v);
-    if (type !== ARRAY && type !== OBJECT) {
-        return v_to_i(v, type);
-    } else {
-        return v[HASH] || obvize(v)[HASH];
-    }
-}
 
 export {
     obvize, hash,
