@@ -6,7 +6,7 @@ require("source-map-support").install({
 
 const {obvize, i_to_v, hash} = require("./dist/obverse");
 
-let i = obvize({
+let v = obvize({
     a: 1,
     b: "two",
     c: null,
@@ -15,12 +15,18 @@ let i = obvize({
     ],
     e: {
         //f:new Date(),
-        g: Symbol("duh")
+        g: Symbol("duh"),
+        h: "not a symbol"
     }
 })
-console.log(i)
-console.log(i_to_v)
-let v = i_to_v(i);
+
+
+//console.log("v", v);
+//console.log("v", JSON.stringify(v));
+//console.log("v.d", v.d);
+//console.log("v.d", JSON.stringify(v.d));
+
+
 
 console.log("v", v);
 console.log("hash(v)", hash(v));
