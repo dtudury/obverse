@@ -1,10 +1,9 @@
-"use strict";
-
+/* jshint node: true */
 require("source-map-support").install({
     environment: "node"
 });
 
-const {obvize, i_to_v, hash} = require("./dist/obverse");
+const {obvize, hash} = require("./dist/obverse");
 
 let v = obvize({
     a: 1,
@@ -18,7 +17,7 @@ let v = obvize({
         g: Symbol("duh"),
         h: "not a symbol"
     }
-})
+});
 
 
 //console.log("v", v);
