@@ -7,4 +7,4 @@ export default {
         file: "dist/obverse.js",
         format: "cjs"
     }
-}
+};

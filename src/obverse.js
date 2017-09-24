@@ -43,7 +43,7 @@ const obvize = (object, parent) => {
     const deltas = new object.constructor(); //differences
     const values = new object.constructor(); //virtual object
     const observers = new object.constructor(); //watching for changes in children
-    const parents = new Set(parent ? [parent] : [])
+    const parents = new Set(parent ? [parent] : []);
     const getter = property => {
         switch (property) {
             case HASH:
@@ -54,7 +54,7 @@ const obvize = (object, parent) => {
                 return parents;
             default:
                 //console.log(`get ${property.toString()}`, values[property]);
-                return values[property]
+                return values[property];
         }
     };
     const setter = (property, value) => {
@@ -75,22 +75,21 @@ const obvize = (object, parent) => {
             }
             parents.forEach(f => f());
             let new_hash = indexify(proxy);
-            console.log(new_hash)
+            console.log(new_hash);
         }
         return value;
     };
     const proxy = new Proxy(values, {
-        get: (target, property, receiver) => getter(property),
-        set: (target, property, value, receiver) => setter(property, value),
+        get: (target, property/*, receiver*/) => getter(property),
+        set: (target, property, value/*, receiver*/) => setter(property, value),
         deleteProperty: (target, property) => {
             setter(property);
             return true;
         }
-    })
+    });
     Object.keys(object).forEach(name => {
         const value = object[name];
         const type = v_to_t(value);
-        let obv;
         if (type === ARRAY || type === OBJECT) {
             observers[name] = () => {
                 console.log(`${name} changed on`)
@@ -116,4 +115,4 @@ export {
     obvize, hash,
     /*checkout,*/
     i_to_v
-}
+};
