@@ -42,6 +42,7 @@ const obvize = (object, parent) => {
     const hashes = new object.constructor(); //original map
     const deltas = new object.constructor(); //differences
     const values = new object.constructor(); //virtual object
+    const observers = new object.constructor(); //watching for changes in children
     const parents = new Set(parent ? [parent] : [])
     const getter = property => {
         switch (property) {
@@ -72,6 +73,7 @@ const obvize = (object, parent) => {
             } else {
                 deltas[property] = hash_value;
             }
+            parents.forEach(f => f());
             let new_hash = indexify(proxy);
             console.log(new_hash)
         }
@@ -90,7 +92,10 @@ const obvize = (object, parent) => {
         const type = v_to_t(value);
         let obv;
         if (type === ARRAY || type === OBJECT) {
-            values[name] = obvize(value, proxy);
+            observers[name] = () => {
+                console.log(`${name} changed on`)
+            }
+            values[name] = obvize(value, observers[name]);
             hashes[name] = values[name][HASH];
         } else {
             values[name] = value;
