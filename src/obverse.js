@@ -7,16 +7,6 @@ import {
     ARRAY
 } from "./primitiveStore";
 
-/*
-const CHECKOUT = Symbol("create a managed instance of the data");
-const PUSH = Symbol("send changes upstream");
-const PULL = Symbol("get any upstream changes");
-const DIFF = Symbol("changes since PULL")
-const COMMIT = Symbol("bundle and label changes since PULL");
-const BRANCH = Symbol("create separate data copy");
-const MERGE = Symbol("merge current copy's changes to another copy");
-*/
-
 const HASH = Symbol("hash as index of value in storage array");
 const STRING = Symbol("json object with indexes instead of values");
 const PARENTS = Symbol("obvs with hashes dependent on current obv");
@@ -58,7 +48,7 @@ const obvize = (object, parent) => {
         }
     };
     const setter = (property, value) => {
-        console.log(`set ${property} to ${value}`);
+        //console.log(`set ${property} to ${value}`);
         if (value !== values[property]) {
             if (values[property] && values[property][PARENTS]) {
                 values[property][PARENTS].delete(proxy);
@@ -70,10 +60,11 @@ const obvize = (object, parent) => {
             const hash_value = hash(value);
             if (hashes[property] === hash_value) {
                 delete deltas[property];
+                parents.forEach(f => f(false));
             } else {
                 deltas[property] = hash_value;
+                parents.forEach(f => f(true));
             }
-            parents.forEach(f => f());
             let new_hash = indexify(proxy);
             console.log(new_hash);
         }
@@ -91,7 +82,18 @@ const obvize = (object, parent) => {
         const value = object[name];
         const type = v_to_t(value);
         if (type === ARRAY || type === OBJECT) {
-            observers[name] = () => {
+            observers[name] = changed => {
+                if (changed) {
+                    delete deltas[name];
+                    if (Object.keys(deltas).length === 0) {
+                        parents.forEach(f => f(false));
+                    }
+                } else {
+                    deltas[name] = -1;
+                    if (Object.keys(deltas).length === 1) {
+                        parents.forEach(f => f(true));
+                    }
+                }
                 console.log(`${name} changed on`)
             }
             values[name] = obvize(value, observers[name]);
@@ -105,14 +107,7 @@ const obvize = (object, parent) => {
     return proxy;
 };
 
-/*
-function checkout(value) {
-    return value[CHECKOUT];
-}
-*/
-
 export {
     obvize, hash,
-    /*checkout,*/
     i_to_v
 };
