@@ -17,11 +17,11 @@ const BOOLEAN = v_to_t(false),
 const nums = {},
     strs = {},
     syms = {},
-    _a = [undefined, null, true, false], //0: undefined, 1: null, 2: true, 3: false
+    _a = [,, null, true, false], //1: undefined, 2: null, 3: true, 4: false
     v_to_i_for_t = {
-        [BOOLEAN]: v => v ? 2 : 3, //hard-coded (it's okay, I'm a professional)
-        [NULL]: () => 1, //hard-coded
-        [UNDEFINED]: () => 0, //hard-coded
+        [BOOLEAN]: v => v ? 3 : 4, //hard-coded (it's okay, I'm a professional)
+        [NULL]: () => 2, //hard-coded
+        [UNDEFINED]: () => 1, //hard-coded
         [NUMBER]: v => nums[v] || (nums[v] = new_v_to_i(v)),
         [STRING]: v => strs[v] || (strs[v] = new_v_to_i(v)),
         [SYMBOL]: v => syms[v] || (syms[v] = new_v_to_i(v))

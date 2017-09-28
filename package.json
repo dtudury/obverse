@@ -8,7 +8,8 @@
     "dev": "rollup -c -w -m",
     "prepublish": "npm run build",
     "pretest": "rollup -c -m",
-    "test": "node test.js"
+    "test": "node test.js",
+    "debug": "npm run pretest && node --inspect-brk test.js"
   },
   "repository": {
     "type": "git",

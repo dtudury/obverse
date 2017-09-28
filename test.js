@@ -1,9 +1,7 @@
 /* jshint node: true */
-require("source-map-support").install({
-    environment: "node"
-});
+require("source-map-support").install({environment: "node"});
 
-const {obvize, hash} = require("./dist/obverse");
+const {obvize, hash, commit} = require("./dist/obverse");
 
 let v = obvize({
     a: 1,
@@ -15,32 +13,22 @@ let v = obvize({
     e: {
         //f:new Date(),
         g: Symbol("duh"),
-        h: "not a symbol"
+        h: "not a symbol",
+        i: {
+            j: "k"
+        }
     }
 });
 
-
-//console.log("v", v);
-//console.log("v", JSON.stringify(v));
-//console.log("v.d", v.d);
-//console.log("v.d", JSON.stringify(v.d));
-
-
-
-console.log("v", v);
 console.log("hash(v)", hash(v));
-console.log("v.e.g", v.e.g);
-console.log("hash(v.e.g)", hash(v.e.g));
+console.log("hash(v.e.i.j)", hash(v.e.i.j));
 
-
-delete v.e.g;
-console.log("v", v);
+delete v.e.i.j;
+commit(v);
 console.log("hash(v)", hash(v));
-console.log("v.e.g", v.e.g);
-console.log("hash(v.e.g)", hash(v.e.g));
+console.log("hash(v.e.i.j)", hash(v.e.i.j));
 
-v.e.g = 5;
-console.log("v", v);
+v.e.i.j = 5;
+commit(v);
 console.log("hash(v)", hash(v));
-console.log("v.e.g", v.e.g);
-console.log("hash(v.e.g)", hash(v.e.g));
+console.log("hash(v.e.i.j)", hash(v.e.i.j));
