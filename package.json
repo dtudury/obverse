@@ -1,6 +1,6 @@
 {
   "name": "obverse",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "observable object versioning universe",
   "main": "lib/index.js",
   "scripts": {
