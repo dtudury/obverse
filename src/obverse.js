@@ -8,6 +8,7 @@ const HASH = Symbol("hash as index of value in storage array");
 const COMMIT = Symbol("recalculate hash");
 const DEPENDENTS = Symbol("obvs with hashes dependent on current obv");
 
+// factory to proxy objects so that they can be hashed, changes can be tracked, and committed and rehashed later
 const obvize = (object, dependent, t = v_to_t(object)) => {
     if (t !== ARRAY && t !== OBJECT) {
         throw new Error("obvize must be called on an object or array");
@@ -44,12 +45,12 @@ const obvize = (object, dependent, t = v_to_t(object)) => {
     const setter = (property, value) => {
         if (value !== values[property]) {
             if (values[property] && values[property][DEPENDENTS]) {
-                values[property][DEPENDENTS].delete(observers[property]);
+                values[property][DEPENDENTS].delete(observers[property]); //stop watching old value
+            }
+            if (value && value[DEPENDENTS]) {
+                value[DEPENDENTS].add(observers[property]); //start watching new value
             }
             values[property] = value;
-            if (values[property] && values[property][DEPENDENTS]) {
-                values[property][DEPENDENTS].add(observers[property]);
-            }
             toucher(property);
         }
         return value;
