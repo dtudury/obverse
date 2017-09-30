@@ -8,9 +8,13 @@ const HASH = Symbol("hash as index of value in storage array");
 const COMMIT = Symbol("recalculate hash");
 const DEPENDENTS = Symbol("obvs with hashes dependent on current obv");
 
-const obvize = (object, t = v_to_t(object), dependent) => {
+const obvize = (object, dependent, t = v_to_t(object)) => {
     if (t !== ARRAY && t !== OBJECT) {
         throw new Error("obvize must be called on an object or array");
+    }
+    if (object[DEPENDENTS]) { //already obvized
+        object[DEPENDENTS].add(dependent);
+        return object;
     }
     const hashes = new object.constructor(); //original map
     const values = new object.constructor(); //virtual object
@@ -60,8 +64,8 @@ const obvize = (object, t = v_to_t(object), dependent) => {
         const v = object[property];
         const t = v_to_t(v);
         if (t === ARRAY || t === OBJECT) {
-            observers[property] = () => toucher(property);
-            values[property] = obvize(v, t, observers[property]);
+            observers[property] = () => toucher(property); //on change just mark property as "touched"
+            values[property] = obvize(v, observers[property], t);
             hashes[property] = values[property][HASH];
         } else {
             values[property] = v;
@@ -71,7 +75,7 @@ const obvize = (object, t = v_to_t(object), dependent) => {
     let hash_index = _stringified_to_i(JSON.stringify(hashes));
     return proxy;
 };
-const hash = (v, t = v_to_t(v)) => _primitive_to_i(v, t) || v[HASH] || obvize(v, t)[HASH]
+const hash = (v, t = v_to_t(v)) => _primitive_to_i(v, t) || v[HASH] || obvize(v, null, t)[HASH]
 const commit = (v, t = v_to_t(v)) => _primitive_to_i(v, t) || v[COMMIT];
 
 export {obvize, hash, commit};
