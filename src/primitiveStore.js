@@ -18,7 +18,7 @@ const nums = {},
     strs = {},
     syms = {},
     _a = [
-        ,, null, true, false //1: undefined, 2: null, 3: true, 4: false
+        undefined, undefined, null, true, false //1: undefined, 2: null, 3: true, 4: false
     ],
     v_to_i_for_t = {
         [BOOLEAN]: v => v ? 3 : 4, //hard-coded (it's okay, I'm a professional)

@@ -55,7 +55,6 @@ const obvize = (object, dependent, t = v_to_t(object)) => {
         }
         return value;
     };
-    const deleter = property => !void setter(property);
     const proxy = new Proxy(values, {
         get: (target, property) => getter(property),
         set: (target, property, value) => setter(property, value),
@@ -76,7 +75,7 @@ const obvize = (object, dependent, t = v_to_t(object)) => {
     let hash_index = _stringified_to_i(JSON.stringify(hashes));
     return proxy;
 };
-const hash = (v, t = v_to_t(v)) => _primitive_to_i(v, t) || v[HASH] || obvize(v, null, t)[HASH]
+const hash = (v, t = v_to_t(v)) => _primitive_to_i(v, t) || v[HASH] || obvize(v, null, t)[HASH];
 const commit = (v, t = v_to_t(v)) => _primitive_to_i(v, t) || v[COMMIT];
 
 export {obvize, hash, commit};
