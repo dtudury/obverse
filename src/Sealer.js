@@ -2,28 +2,31 @@ import {v_to_t, OBJECT, ARRAY} from "./primitiveStore";
 
 const BREAKS = Symbol("broken seals");
 const MEND = Symbol("unbreak seals");
+
+//TODO: make only one dependent and simplify this (think json, not actual object)
+
 const DEPENDENTS = Symbol("sealed objects sealing this object");
 
 const seal = (object, t = v_to_t(object)) => {
     if (t !== ARRAY && t !== OBJECT) {
         throw new Error("only objects and arrays can be sealed");
     }
-    if (object[DEPENDENTS]) { //already obvized
+    if (object[DEPENDENTS]) { //already sealed
         return object[MEND];
     }
     const values = new object.constructor(); //virtual object
     let broken_seals = new object.constructor(); //broken seals
     const seal_breakers = new object.constructor(); //watchers for changes in children
     const dependents = new Set(); //watchers for changes in this
-    const seal_breaker = (property, child_breaks = true) => {
+    const break_seal = (property, child_breaks = true) => {
         dependents.forEach(f => f(broken_seals));
         dependents.clear();
         broken_seals[property] = child_breaks;
     };
-    const property_sealer = (property, v, t = v_to_t(v)) => {
+    const seal_property = (property, v, t = v_to_t(v)) => {
         if (t === ARRAY || t === OBJECT) {
             values[property] = seal(v, t);
-            seal_breakers[property] = seal_breakers[property] || (child_breaks => seal_breaker(property, child_breaks));
+            seal_breakers[property] = seal_breakers[property] || (child_breaks => break_seal(property, child_breaks));
             values[property][DEPENDENTS].add(seal_breakers[property]);
         } else {
             values[property] = v;
@@ -34,7 +37,7 @@ const seal = (object, t = v_to_t(object)) => {
             case BREAKS:
                 return broken_seals;
             case MEND:
-                Object.keys(broken_seals).forEach(key => property_sealer(key, values[key]));
+                Object.keys(broken_seals).forEach(key => seal_property(key, values[key]));
                 broken_seals = new object.constructor();
                 return proxy;
             case DEPENDENTS:
@@ -52,7 +55,7 @@ const seal = (object, t = v_to_t(object)) => {
                 value[DEPENDENTS].add(seal_breakers[property]); //start watching new value
             }
             values[property] = value;
-            seal_breaker(property, breaks(value));
+            break_seal(property);
         }
         return value;
     };
@@ -61,7 +64,7 @@ const seal = (object, t = v_to_t(object)) => {
         set: (target, property, value) => setter(property, value),
         deleteProperty: (target, property) => !void setter(property)
     });
-    Object.keys(object).forEach(key => property_sealer(key, object[key]));
+    Object.keys(object).forEach(key => seal_property(key, object[key]));
     return proxy;
 };
 
