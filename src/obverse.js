@@ -1,4 +1,4 @@
-import {seal, breaks} from "./Sealer";
+import {seal, breaks, mend} from "./Sealer";
 import indexify from "./indexify";
 
-export {seal, breaks, indexify};
+export {seal, breaks, mend, indexify};

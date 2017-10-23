@@ -2,28 +2,22 @@ import {v_to_t, OBJECT, ARRAY} from "./primitiveStore";
 
 const BREAKS = Symbol("get map of broken seals");
 const MEND = Symbol("unbreak seals, get self");
+const DETACH = Symbol("stop informing dependent");
 
-let default_dependent = broken_seals => {
-    //console.log("default_dependent: ", broken_seals);
-    return broken_seals;
-};
-
-const seal = (object, t = v_to_t(object), dependent = default_dependent) => {
+const seal = (object, t = v_to_t(object), dependent = () => {}) => {
     if (t !== ARRAY && t !== OBJECT) {
         throw new Error("only objects and arrays can be sealed");
     }
     const values = new object.constructor(); //virtual object
-    const seal_breakers = new object.constructor(); //watchers for changes in children
-    let broken_seals = new object.constructor(); //broken seals
+    let broken_seals = null; //broken seals
     const break_seal = (property, child_breaks = true) => {
+        broken_seals = broken_seals || new object.constructor();
         broken_seals[property] = child_breaks;
         dependent(broken_seals);
-        delete seal_breakers[property];
     };
     const seal_property = (property, v, t = v_to_t(v)) => {
         if (t === ARRAY || t === OBJECT) {
-            seal_breakers[property] = seal_breakers[property] || (child_breaks => break_seal(property, child_breaks));
-            values[property] = seal(v, t, seal_breakers[property]);
+            values[property] = seal(v, t, child_breaks => break_seal(property, child_breaks));
         } else {
             values[property] = v;
         }
@@ -33,17 +27,26 @@ const seal = (object, t = v_to_t(object), dependent = default_dependent) => {
             case BREAKS:
                 return broken_seals;
             case MEND:
-                Object.keys(broken_seals).forEach(key => {
-                    seal_property(key, values[key]);
-                });
-                broken_seals = new object.constructor();
+                if (broken_seals) {
+                    Object.keys(broken_seals).forEach(key => {
+                        if (values[key] === undefined) {
+                            delete values[key];
+                        } else if (broken_seals[key] === true) {
+                            seal_property(key, values[key]);
+                        }
+                    });
+                    broken_seals = null;
+                }
                 return proxy;
+            case DETACH:
+                return dependent = () => {};
             default:
                 return values[property];
         }
     };
     const setter = (property, value) => {
         if (value !== values[property]) {
+            values[property] && values[property][DETACH];
             values[property] = value;
             break_seal(property);
         }

@@ -27,7 +27,7 @@ describe("obverse", function() {
                 d:{
                     e:5
                 }
-            }, undefined, broken_seals => console.log("default", broken_seals));
+            });
             obj.a++;
             obj.c.push(5);
             obj.d.e++;
@@ -35,6 +35,41 @@ describe("obverse", function() {
             assert(!breaks(obj).b, "should be no break on unchanged attribute");
             assert(breaks(obj).c, "should break on appended to array member");
             assert(breaks(obj).d.e, "should break on modification of sub-objects");
+            delete obj.b;
+            assert(breaks(obj).b, "should break on deleted attribute");
+
+            const obj2 = seal(obj);
+            assert(breaks(obj).b, "original should still be broken after sealing");
+            assert(!breaks(obj2), "newly sealed object should be unbroken");
+            obj2.x = true;
+            obj.y = true;
+            assert(!breaks(obj).x, "changes to copy shouldn't break original");
+            assert(!breaks(obj2).y, "changes to original shouldn't break copy");
+
+        });
+    });
+    describe("#mend()", function() {
+        const {seal, breaks, mend} = require("../dist/obverse");
+        it("mends like it should", function () {
+            const obj = seal({
+                a:1,
+                b:true,
+                c:[2,3,4],
+                d:{
+                    e:5
+                }
+            });
+            obj.a++;
+            delete obj.b;
+            obj.c.push(5);
+            obj.d.e++;
+            mend(obj);
+            assert(!breaks(obj), "should have no breaks after mend");
+            let f = obj.d;
+            obj.d = {};
+            mend(obj);
+            f.x = true;
+            assert(!breaks(obj), "should have no breaks after mend (even after modifying previously sealed member object)");
         });
     });
 });
