@@ -1,10 +1,9 @@
 /* eslint-env node, mocha */
-/* eslint no-console: off */
 
 const assert = require("assert");
 
 describe("obverse", function() {
-    describe("indexify", function() {
+    describe("#indexify()", function() {
         const {indexify} = require("../dist/obverse");
         it("returns the same value regardless of attribute order at creation", function() {
             const a = indexify({
@@ -36,6 +35,7 @@ describe("obverse", function() {
             assert.throws(() => indexify(true), "must throw when passed a boolean");
             assert.throws(() => indexify(false), "must throw when passed a boolean");
             assert.throws(() => indexify(new Date()), "must throw when passed a date");
+            assert.throws(() => indexify(Symbol("test")), "must throw when passed a symbol");
             assert.throws(() => indexify(), "must throw when passed nothing");
         });
     });
