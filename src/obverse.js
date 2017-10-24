@@ -1,4 +1,7 @@
 import {seal, breaks, mend} from "./Sealer";
-import indexify from "./indexify";
+import Indexifier from "./Indexifier";
+const indexifier = new Indexifier();
+const indexify = indexifier.indexify;
+const deindexify = indexifier.deindexify;
 
-export {seal, breaks, mend, indexify};
+export {seal, breaks, mend, indexify, deindexify};

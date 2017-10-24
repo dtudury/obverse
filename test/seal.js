@@ -59,6 +59,7 @@ describe("obverse", function() {
                     e:5
                 }
             });
+            assert.doesNotThrow(() => mend(obj), "mending unbroken seals shouldn't throw errors");
             obj.a++;
             delete obj.b;
             obj.c.push(5);
