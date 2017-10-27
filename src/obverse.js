@@ -1,14 +1,14 @@
 import {seal, breaks, mend} from "./Sealer";
 import Indexifier from "./Indexifier";
 const indexifier = new Indexifier();
-const indexify = indexifier.indexify;
-const deindexify = indexifier.deindexify;
+const toIndex = indexifier.toIndex;
+const toValue = indexifier.toValue;
 
 const _logs = new WeakMap();
 
 const init = (state = {}) => {
     const sealed_state = seal(state);
-    const index = indexify(state);
+    const index = toIndex(state);
     _logs.set(sealed_state, [index]);
     return sealed_state;
 };
@@ -16,7 +16,7 @@ const init = (state = {}) => {
 const _clone = obj => Object.assign(new obj.constructor(), obj);
 
 const _patch_index = (value_map, break_map, index_map_index) => {
-    const index_map= _clone(deindexify(index_map_index));
+    const index_map= _clone(toValue(index_map_index));
     Object.keys(break_map).forEach(name => {
         const v = value_map[name];
         const b = break_map[name];
@@ -24,12 +24,12 @@ const _patch_index = (value_map, break_map, index_map_index) => {
         if (v === undefined) {
             delete index_map[name];
         } else if (b === true) {
-            index_map[name] = indexify(v);
+            index_map[name] = toIndex(v);
         } else {
             index_map[name] = _patch_index(v, b, i);
         }
     });
-    return indexify(index_map);
+    return toIndex(index_map);
 };
 
 const commit = sealed_state => {
@@ -46,4 +46,4 @@ const log = sealed_state => {
 };
 
 
-export {seal, breaks, mend, indexify, deindexify, init, commit, log};
+export {seal, breaks, mend, toIndex, toValue, init, commit, log};

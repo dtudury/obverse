@@ -3,11 +3,11 @@
 const assert = require("assert");
 
 describe("obverse", function() {
-    describe("#indexify()", function() {
-        const {indexify} = require("../dist/obverse");
+    describe("#toIndex()", function() {
+        const {toIndex} = require("../dist/obverse");
         it("returns the same value regardless of attribute order at creation", function() {
-            const a = indexify({foo: 1, bar: 2});
-            const b = indexify({bar: 2, foo: 1});
+            const a = toIndex({foo: 1, bar: 2});
+            const b = toIndex({bar: 2, foo: 1});
             assert.equal(a, b, "attribute order shouldn't matter");
         });
         it("returns a different value after a deep change", function() {
@@ -16,30 +16,30 @@ describe("obverse", function() {
                     bar: 1
                 }
             };
-            const a = indexify(obj);
+            const a = toIndex(obj);
             obj.foo.bar = 2;
-            const b = indexify(obj);
+            const b = toIndex(obj);
             assert.notEqual(a, b, "deep changes should matter");
         });
         it("returns different values for similar types", function() {
-            assert.notEqual(indexify(true), indexify("true"), "booleans and their string representations should be different");
-            assert.notEqual(indexify(false), indexify("false"), "booleans and their string representations should be different");
-            assert.notEqual(indexify(true), indexify(false), "true and false should be different");
-            assert.notEqual(indexify(Symbol()), indexify("Symbol()"), "symbols and their string representations should be different");
-            assert.notEqual(indexify(0), indexify("0"), "numbers and their string representations should be different");
-            assert.notEqual(indexify(null), indexify("null"), "null and its string representations should be different");
-            assert.notEqual(indexify(undefined), indexify("undefined"), "undefined and its string representations should be different");
+            assert.notEqual(toIndex(true), toIndex("true"), "booleans and their string representations should be different");
+            assert.notEqual(toIndex(false), toIndex("false"), "booleans and their string representations should be different");
+            assert.notEqual(toIndex(true), toIndex(false), "true and false should be different");
+            assert.notEqual(toIndex(Symbol()), toIndex("Symbol()"), "symbols and their string representations should be different");
+            assert.notEqual(toIndex(0), toIndex("0"), "numbers and their string representations should be different");
+            assert.notEqual(toIndex(null), toIndex("null"), "null and its string representations should be different");
+            assert.notEqual(toIndex(undefined), toIndex("undefined"), "undefined and its string representations should be different");
         });
         it("errors with non primitive values", function() {
-            assert.throws(() => indexify(new Date()), "errors when indexifying a date");
+            assert.throws(() => toIndex(new Date()), "errors when toIndexing a date");
         });
     });
-    describe("#deindexify", function() {
-        const {indexify, deindexify} = require("../dist/obverse");
+    describe("#toValue", function() {
+        const {toIndex, toValue} = require("../dist/obverse");
         it("reverses", function() {
-            assert.equal(true, deindexify(indexify(true)), "true is true");
-            assert.equal(false, deindexify(indexify(false)), "false is false");
-            assert.equal(1, deindexify(indexify(1)), "1 is 1");
+            assert.equal(true, toValue(toIndex(true)), "true is true");
+            assert.equal(false, toValue(toIndex(false)), "false is false");
+            assert.equal(1, toValue(toIndex(1)), "1 is 1");
         });
     });
 });
