@@ -6,7 +6,8 @@ const BOOLEAN = v_to_t(false),
     STRING = v_to_t(""),
     SYMBOL = v_to_t(Symbol.iterator),
     OBJECT = v_to_t({}),
-    ARRAY = v_to_t([]);
+    ARRAY = v_to_t([]),
+    FUNCTION = v_to_t(function(){});
 
 export {
     v_to_t,
@@ -17,5 +18,6 @@ export {
     STRING,
     SYMBOL,
     OBJECT,
-    ARRAY
+    ARRAY,
+    FUNCTION
 };
