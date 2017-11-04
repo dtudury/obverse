@@ -1,6 +1,8 @@
 import { OBJECT, ARRAY } from "./Types";
 
 const DEPENDENTS = Symbol("collection of observers");
+const HEAD = Symbol("current commit");
+const LOG = Symbol("commit history");
 const COMMIT = Symbol("commit changes");
 
 const _unset_value = (tree, watcher, property) => {
@@ -12,16 +14,17 @@ const _unset_value = (tree, watcher, property) => {
 };
 
 const _set_value = (tree, watcher, property, value) => {
+    console.log("watcher", property, watcher);
     tree[property] = value;
     if (value && value[DEPENDENTS]) {
         value[DEPENDENTS].add(watcher);
     }
 };
 
-const init = (HEAD, indexifier) => {
+const init = (commit_index, indexifier) => {
     const { toIndex, toValue, toType } = indexifier;
-    const hash_tree = toValue(HEAD);
-    const type = toType(HEAD);
+    const hash_tree = toValue(commit_index);
+    const type = toType(commit_index);
     if (type !== OBJECT && type !== ARRAY) {
         return hash_tree;
     }
@@ -33,12 +36,16 @@ const init = (HEAD, indexifier) => {
 
     const _watcher_for = property => watchers[property] || (watchers[property] = value => set(virtual_tree, property, value));
     const get = (target, property) => {
-        if (property === COMMIT) {
+        if (property === HEAD) {
+            return commit_index;
+        } else if (property === LOG) {
+            return log;
+        } else if (property === COMMIT) {
             return message => {
-                log.push({commit:HEAD, message});
+                log.push({ commit_index, message });
                 Object.keys(working_tree).forEach(property => hash_tree[property] = working_tree[property][COMMIT](message));
                 working_tree = new hash_tree.constructor();
-                return HEAD = toIndex(hash_tree);
+                return commit_index = toIndex(hash_tree);
             };
         } else if (property === DEPENDENTS) {
             return dependents;
@@ -57,11 +64,18 @@ const init = (HEAD, indexifier) => {
         delete virtual_tree[property];
         _unset_value(working_tree, watcher, property);
         _set_value(working_tree, watcher, property, value);
-        [...dependents].forEach(dependent => dependent(proxy));
+        dependents.forEach(dependent => {
+            console.log(dependent);
+            //dependent(proxy);
+        });
     };
     const deleteProperty = (target, property) => !void set(target, property);
     const proxy = new Proxy(hash_tree, { get, set, deleteProperty });
     return proxy;
 };
 
-export { init };
+const commit = (proxy, message) => proxy[COMMIT](message);
+const log = proxy => proxy[LOG];
+const head = proxy => proxy[HEAD];
+
+export { init, commit, head, log };

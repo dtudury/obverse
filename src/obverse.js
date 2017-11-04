@@ -1,6 +1,6 @@
 import {seal, breaks, mend} from "./Sealer";
 import Indexifier from "./Indexifier";
-import {init as juzy_init} from "./Juzy";
+import {init as juzy_init, commit as juzy_commit, log as juzy_log, head as juzy_head} from "./Juzy";
 const indexifier = new Indexifier();
 const toIndex = indexifier.toIndex;
 const toValue = indexifier.toValue;
@@ -47,4 +47,4 @@ const log = sealed_state => {
 };
 
 
-export {seal, breaks, mend, toIndex, toValue, init, commit, log, juzy_init, indexifier};
+export {seal, breaks, mend, toIndex, toValue, init, commit, log, juzy_init, juzy_commit, juzy_log, juzy_head, indexifier};
