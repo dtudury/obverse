@@ -1,5 +1,7 @@
 /* eslint-env node, mocha */
 
+//npm run pretest ; ./node_modules/.bin/mocha  --require source-map-support/register test/temp.js
+
 
 const assert = require("assert");
 
