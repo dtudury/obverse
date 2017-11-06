@@ -50,5 +50,6 @@ export default class {
         };
         this.toValue = i => _values[i];
         this.toType = i => _types[i];
+        this.values = () => _values;
     }
 }

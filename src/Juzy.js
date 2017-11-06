@@ -14,7 +14,7 @@ const _unset_value = (tree, watcher, property) => {
 };
 
 const _set_value = (tree, watcher, property, value) => {
-    console.log("watcher", property, watcher);
+    console.log("            setting", property, value);
     tree[property] = value;
     if (value && value[DEPENDENTS]) {
         value[DEPENDENTS].add(watcher);
@@ -42,8 +42,20 @@ const init = (commit_index, indexifier) => {
             return log;
         } else if (property === COMMIT) {
             return message => {
+                console.log("    committing", hash_tree, working_tree);
                 log.push({ commit_index, message });
-                Object.keys(working_tree).forEach(property => hash_tree[property] = working_tree[property][COMMIT](message));
+                Object.keys(working_tree).forEach(property => {
+                    const value = working_tree[property];
+                    const committer = value[COMMIT];
+                    if (committer) {
+                        hash_tree[property] = committer(message);
+                        console.log("        has committer", property, value);
+                    } else {
+                        hash_tree[property] = toIndex(value);
+                        console.log("        has no committer", property, value, hash_tree[property]);
+                    }
+                });
+                console.log("    /committing", hash_tree, working_tree);
                 working_tree = new hash_tree.constructor();
                 return commit_index = toIndex(hash_tree);
             };
@@ -64,9 +76,12 @@ const init = (commit_index, indexifier) => {
         delete virtual_tree[property];
         _unset_value(working_tree, watcher, property);
         _set_value(working_tree, watcher, property, value);
-        dependents.forEach(dependent => {
-            console.log(dependent);
-            //dependent(proxy);
+        Array.from(dependents).forEach(dependent => {
+            dependent(proxy);
+        });
+        dependents.forEach((dependent, key) => {
+            //TODO: WTF?
+            //console.log(dependent, key, dependents, Array.from(dependents));
         });
     };
     const deleteProperty = (target, property) => !void set(target, property);
