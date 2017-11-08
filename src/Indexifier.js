@@ -13,8 +13,10 @@ import {
 export default class {
     constructor() {
         const _new_v_to_i = (v, t) => {
+                const i = _types.length;
                 _types.push(t);
-                return _values.push(v) - 1;
+                _values.push(v);
+                return i;
             },
             _v_to_i = (v, t = v_to_t(v)) => (_v_to_i_for_t[t] || (() => {
                 throw new Error(`type ${t} not in _v_to_i_for_t`);
@@ -40,18 +42,14 @@ export default class {
         this.toIndex = (object, t = v_to_t(object)) => {
             let i;
             if (t !== ARRAY && t !== OBJECT) {
-                i = _v_to_i(object, t);
-                console.log(object, "=>", i);
-                return i
+                return _v_to_i(object, t);
             }
             const index_map = new object.constructor(); //map of pointers to original values
             Object.keys(object).sort().forEach(property => {
                 index_map[property] = this.toIndex(object[property]);
             });
             const json = JSON.stringify(index_map);
-            i = _jsons[json] || (_jsons[json] = _new_v_to_i(json, t));
-            console.log(json, "=>", i);
-            return i;
+            return _jsons[json] || (_jsons[json] = _new_v_to_i(json, t));
         };
         this.toValue = i => _values[i];
         this.toType = i => _types[i];

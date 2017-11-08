@@ -14,7 +14,6 @@ const _unset_value = (tree, watcher, property) => {
 };
 
 const _set_value = (tree, watcher, property, value) => {
-    console.log("            setting", property, value);
     tree[property] = value;
     if (value && value[DEPENDENTS]) {
         value[DEPENDENTS].add(watcher);
@@ -42,23 +41,19 @@ const init = (commit_index, indexifier) => {
             return log;
         } else if (property === COMMIT) {
             return message => {
-                console.log("    committing", hash_tree, working_tree);
                 log.push({ commit_index, message });
                 Object.keys(working_tree).forEach(property => {
                     const value = working_tree[property];
                     const committer = value[COMMIT];
                     if (committer) {
                         hash_tree[property] = committer(message);
-                        console.log("        has committer", property, value);
                     } else {
                         hash_tree[property] = toIndex(value);
-                        console.log("        has no committer", property, value, hash_tree[property]);
                     }
                 });
-                console.log("    /committing", hash_tree, working_tree);
                 working_tree = new hash_tree.constructor();
+                //TODO: this is pretty offensive; make cheaper
                 commit_index = toIndex(proxy);
-                console.log("    |", commit_index)
                 return commit_index;
             };
         } else if (property === DEPENDENTS) {
@@ -68,6 +63,7 @@ const init = (commit_index, indexifier) => {
         } else if (working_tree.hasOwnProperty(property)) {
             return working_tree[property];
         } else if (!virtual_tree.hasOwnProperty(property)) {
+            //TODO: don't love this either
             _set_value(virtual_tree, _watcher_for(property), property, init(hash_tree[property], indexifier));
         }
         return virtual_tree[property];
