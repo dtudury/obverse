@@ -38,15 +38,20 @@ export default class {
                 [SYMBOL]: v => _syms[v] || (_syms[v] = _new_v_to_i(v, SYMBOL))
             };
         this.toIndex = (object, t = v_to_t(object)) => {
+            let i;
             if (t !== ARRAY && t !== OBJECT) {
-                return _v_to_i(object, t);
+                i = _v_to_i(object, t);
+                console.log(object, "=>", i);
+                return i
             }
             const index_map = new object.constructor(); //map of pointers to original values
             Object.keys(object).sort().forEach(property => {
                 index_map[property] = this.toIndex(object[property]);
             });
             const json = JSON.stringify(index_map);
-            return _jsons[json] || (_jsons[json] = _new_v_to_i(index_map, t));
+            i = _jsons[json] || (_jsons[json] = _new_v_to_i(json, t));
+            console.log(json, "=>", i);
+            return i;
         };
         this.toValue = i => _values[i];
         this.toType = i => _types[i];

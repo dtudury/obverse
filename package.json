@@ -9,7 +9,7 @@
     "prepublish": "npm run build",
     "pretest": "rollup -c -m",
     "test": "nyc mocha --require source-map-support/register",
-    "debug": "npm run pretest && node --inspect-brk test.js",
+    "debug": "npm run pretest ; mocha --require source-map-support/register test/temp.js",
     "lint": "eslint --ext .js src/"
   },
   "repository": {

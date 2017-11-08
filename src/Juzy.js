@@ -23,18 +23,18 @@ const _set_value = (tree, watcher, property, value) => {
 
 const init = (commit_index, indexifier) => {
     const { toIndex, toValue, toType } = indexifier;
-    const hash_tree = toValue(commit_index);
     const type = toType(commit_index);
     if (type !== OBJECT && type !== ARRAY) {
-        return hash_tree;
+        return toValue(commit_index);
     }
+    const hash_tree = JSON.parse(toValue(commit_index));
     const log = [];
     const dependents = new Set();
     const watchers = new hash_tree.constructor();
     const virtual_tree = new hash_tree.constructor();
     let working_tree = new hash_tree.constructor();
 
-    const _watcher_for = property => watchers[property] || (watchers[property] = value => set(virtual_tree, property, value));
+    const _watcher_for = property => watchers[property] || (watchers[property] = value => set(working_tree, property, value));
     const get = (target, property) => {
         if (property === HEAD) {
             return commit_index;
@@ -57,7 +57,9 @@ const init = (commit_index, indexifier) => {
                 });
                 console.log("    /committing", hash_tree, working_tree);
                 working_tree = new hash_tree.constructor();
-                return commit_index = toIndex(hash_tree);
+                commit_index = toIndex(proxy);
+                console.log("    |", commit_index)
+                return commit_index;
             };
         } else if (property === DEPENDENTS) {
             return dependents;
