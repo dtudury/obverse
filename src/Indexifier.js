@@ -40,7 +40,6 @@ export default class {
                 [SYMBOL]: v => _syms[v] || (_syms[v] = _new_v_to_i(v, SYMBOL))
             };
         this.toIndex = (object, t = v_to_t(object)) => {
-            let i;
             if (t !== ARRAY && t !== OBJECT) {
                 return _v_to_i(object, t);
             }

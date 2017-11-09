@@ -77,10 +77,12 @@ const init = (commit_index, indexifier) => {
         Array.from(dependents).forEach(dependent => {
             dependent(proxy);
         });
+        /*
         dependents.forEach((dependent, key) => {
             //TODO: WTF?
-            //console.log(dependent, key, dependents, Array.from(dependents));
+            console.log(dependent, key, dependents, Array.from(dependents));
         });
+        */
     };
     const deleteProperty = (target, property) => !void set(target, property);
     const proxy = new Proxy(hash_tree, { get, set, deleteProperty });
